@@ -141,19 +141,20 @@ function LetterLines({ text }: { text: string }) {
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    if (!ctx) return; // <- Important fix
 
     const letters = text.length;
     const width = (canvas.width = window.innerWidth);
     const height = (canvas.height = window.innerHeight);
 
-    // randomly position points around center for each letter
+    // Random points for each letter
     const points = Array.from({ length: letters }, () => ({
       x: width / 2 + Math.random() * 300 - 150,
       y: height / 2 + Math.random() * 100 - 50,
     }));
 
     function draw() {
+      if (!ctx) return; // <- double check ctx
       ctx.clearRect(0, 0, width, height);
       ctx.strokeStyle = "rgba(0,0,0,0.05)";
       ctx.lineWidth = 1;
