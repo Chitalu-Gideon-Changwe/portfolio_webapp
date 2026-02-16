@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useSpring } from "framer-motion";
+import { useRef, useEffect, useState } from "react";
 
 const sections = [
   { text: "Knock Knock.", color: "zambia-green" },
@@ -19,44 +20,8 @@ const sections = [
 export default function Home() {
   return (
     <main className="snap-y snap-mandatory h-screen overflow-y-auto overflow-x-hidden bg-white relative">
-      {/* ===== Background Orbs ===== */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-grid opacity-20" />
-
-        {/* Animated Zambian orbs */}
-        <motion.div
-          className="absolute w-96 h-96 rounded-full bg-[#198a3a]/20 blur-3xl"
-          animate={{ x: [0, 100, 0], y: [0, 50, 0] }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            repeatType: "mirror",
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute w-96 h-96 rounded-full bg-[#ce2028]/20 blur-3xl"
-          style={{ top: "20%", left: "70%" }}
-          animate={{ x: [0, -80, 0], y: [0, 30, 0] }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            repeatType: "mirror",
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute w-96 h-96 rounded-full bg-[#f7931e]/20 blur-3xl"
-          style={{ top: "50%", left: "50%" }}
-          animate={{ x: [0, 50, 0], y: [0, -50, 0] }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            repeatType: "mirror",
-            ease: "easeInOut",
-          }}
-        />
-      </div>
+      {/* ===== Background Orbs & Parallax Lines ===== */}
+      <Background />
 
       {/* ===== Sections ===== */}
       {sections.map((section, index) => (
@@ -71,6 +36,49 @@ export default function Home() {
       {/* ===== Scroll Progress ===== */}
       <ScrollProgress />
     </main>
+  );
+}
+
+// ---------------- Background Component ----------------
+function Background() {
+  return (
+    <div className="fixed inset-0 pointer-events-none">
+      <div className="absolute inset-0 bg-grid opacity-20" />
+
+      {/* Moving Orbs */}
+      <motion.div
+        className="absolute w-96 h-96 rounded-full bg-[#198a3a]/20 blur-3xl"
+        animate={{ x: [0, 120, 0], y: [0, 60, 0] }}
+        transition={{
+          duration: 15,
+          repeat: Infinity,
+          repeatType: "mirror",
+          ease: "easeInOut",
+        }}
+      />
+      <motion.div
+        className="absolute w-96 h-96 rounded-full bg-[#ce2028]/20 blur-3xl"
+        style={{ top: "20%", left: "70%" }}
+        animate={{ x: [0, -100, 0], y: [0, 40, 0] }}
+        transition={{
+          duration: 18,
+          repeat: Infinity,
+          repeatType: "mirror",
+          ease: "easeInOut",
+        }}
+      />
+      <motion.div
+        className="absolute w-96 h-96 rounded-full bg-[#f7931e]/20 blur-3xl"
+        style={{ top: "50%", left: "50%" }}
+        animate={{ x: [0, 80, 0], y: [0, -60, 0] }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          repeatType: "mirror",
+          ease: "easeInOut",
+        }}
+      />
+    </div>
   );
 }
 
@@ -100,8 +108,8 @@ function Section({
               key={i}
               initial={{
                 opacity: 0,
-                x: Math.random() * 100 - 50,
-                y: Math.random() * 100 - 50,
+                x: Math.random() * 120 - 60,
+                y: Math.random() * 120 - 60,
                 scale: 0.8,
               }}
               animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
@@ -117,7 +125,60 @@ function Section({
           {index + 1} / {total}
         </div>
       </motion.div>
+
+      {/* ===== Optional: Connecting lines between letters ===== */}
+      <LetterLines text={section.text} />
     </section>
+  );
+}
+
+// ---------------- Connecting Lines Component ----------------
+function LetterLines({ text }: { text: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const letters = text.length;
+    const width = (canvas.width = window.innerWidth);
+    const height = (canvas.height = window.innerHeight);
+
+    // randomly position points around center for each letter
+    const points = Array.from({ length: letters }, () => ({
+      x: width / 2 + Math.random() * 300 - 150,
+      y: height / 2 + Math.random() * 100 - 50,
+    }));
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.strokeStyle = "rgba(0,0,0,0.05)";
+      ctx.lineWidth = 1;
+
+      for (let i = 0; i < points.length - 1; i++) {
+        ctx.beginPath();
+        ctx.moveTo(points[i].x, points[i].y);
+        ctx.lineTo(points[i + 1].x, points[i + 1].y);
+        ctx.stroke();
+      }
+
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [text]);
+
+  return (
+    <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" />
   );
 }
 
@@ -138,8 +199,6 @@ function getGradientClass(color: string) {
 }
 
 // ---------------- Scroll Progress ----------------
-import { useScroll, useSpring } from "framer-motion";
-
 function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
