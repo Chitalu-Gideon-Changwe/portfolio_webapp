@@ -1,26 +1,89 @@
 @import "tailwindcss";
 
+/* ===============================
+   Root Theme Variables
+================================= */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --background: #ffffff; /* White background */
+  --foreground: #171717; /* Dark text for readability */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --zambia-green: #198a3a;
+  --zambia-red: #ce2028;
+  --zambia-black: #000000;
+  --zambia-orange: #f7931e;
+  --zambia-copper: #b87333;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+/* ===============================
+   Animations
+================================= */
+
+@keyframes glow {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-glow {
+  animation: glow 6s ease-in-out infinite;
+}
+
+/* ===============================
+   Gradient Text
+================================= */
+
+.gradient-zambia-green {
+  background: linear-gradient(90deg, #198a3a, #22c55e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.gradient-zambia-red {
+  background: linear-gradient(90deg, #ce2028, #ef4444);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.gradient-zambia-orange {
+  background: linear-gradient(90deg, #f7931e, #facc15);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.gradient-zambia-copper {
+  background: linear-gradient(90deg, #b87333, #d97706);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ===============================
+   Grid & Orbs
+================================= */
+
+.bg-grid {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ===============================
+   Scrollbar
+================================= */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
 }
